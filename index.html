@@ -17,13 +17,14 @@ body {
     overflow: hidden;
 }
 
-/* ENVELOPE */
+/* ================= ENVELOPE ================= */
 .envelope {
     width: 240px;
     height: 160px;
     position: relative;
     cursor: pointer;
     transition: 0.6s ease;
+    z-index: 5;
 }
 
 .envelope-back {
@@ -57,18 +58,23 @@ body {
     transform: translateY(-20px) scale(0.95);
     opacity: 0;
     pointer-events: none;
+    visibility: hidden;
 }
 
 .envelope.open .flap {
     transform: rotateX(180deg);
 }
 
-/* CODE SCREEN */
+/* ================= CODE SCREEN ================= */
 .screen {
+    position: absolute;
+    inset: 0;
     display: none;
     flex-direction: column;
+    justify-content: center;
     align-items: center;
     text-align: center;
+    z-index: 9999;
 }
 
 input {
@@ -78,18 +84,23 @@ input {
     outline: none;
     width: 200px;
     text-align: center;
+    pointer-events: auto;
+    touch-action: manipulation;
 }
 
 button {
     margin-top: 10px;
-    padding: 10px 16px;
+    padding: 12px 18px;
     border: none;
     border-radius: 10px;
     background: #ff4d6d;
     color: white;
+    cursor: pointer;
+    pointer-events: auto;
+    touch-action: manipulation;
 }
 
-/* TAP */
+/* ================= TAP ================= */
 .tapOverlay {
     position: absolute;
     bottom: 30px;
@@ -102,9 +113,10 @@ button {
     padding: 8px 14px;
     border-radius: 20px;
     cursor: pointer;
+    z-index: 10;
 }
 
-/* PAPERS */
+/* ================= PAPERS ================= */
 .paper {
     position: absolute;
     width: 320px;
@@ -149,7 +161,7 @@ button {
     <div class="flap"></div>
 </div>
 
-<!-- CODE -->
+<!-- CODE SCREEN -->
 <div id="codeScreen" class="screen">
     <h3>Enter Code 💌</h3>
     <input type="password" id="codeInput" placeholder="Enter code...">
@@ -190,18 +202,25 @@ const backBtn = document.getElementById("backBtn");
 
 const secretCode = "1115";
 
-/* open */
+/* open envelope */
 envelope.addEventListener("click", () => {
     envelope.classList.add("open");
 
     setTimeout(() => {
         envelope.style.display = "none";
         codeScreen.style.display = "flex";
-        document.getElementById("codeInput").focus();
+
+        // force mobile focus fix
+        setTimeout(() => {
+            const input = document.getElementById("codeInput");
+            input.focus();
+            input.click();
+        }, 200);
+
     }, 600);
 });
 
-/* code */
+/* check code */
 function checkCode() {
     const input = document.getElementById("codeInput");
 
@@ -216,31 +235,3 @@ function checkCode() {
 
     } else {
         alert("Wrong code 💔 Try again");
-        input.value = "";
-        input.focus();
-    }
-}
-
-/* show paper 2 */
-tapOverlay.addEventListener("click", () => {
-    tapOverlay.style.display = "none";
-
-    paper2.classList.add("show", "front");
-
-    setTimeout(() => {
-        paper1.classList.remove("front");
-        paper1.classList.add("back");
-    }, 200);
-});
-
-/* back to paper 1 */
-backBtn.addEventListener("click", () => {
-    paper2.classList.remove("show", "front");
-
-    paper1.classList.remove("back");
-    paper1.classList.add("show", "front");
-});
-</script>
-
-</body>
-</html>
