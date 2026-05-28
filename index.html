@@ -17,13 +17,13 @@ body {
     overflow: hidden;
 }
 
-/* ================= ENVELOPE ================= */
+/* ENVELOPE */
 .envelope {
     width: 240px;
     height: 160px;
     position: relative;
     cursor: pointer;
-    transition: transform 0.6s ease, opacity 0.6s ease;
+    transition: 0.6s ease;
 }
 
 .envelope-back {
@@ -32,7 +32,6 @@ body {
     height: 100%;
     background: #ff2f55;
     border-radius: 10px;
-    box-shadow: inset 0 -10px 20px rgba(0,0,0,0.2);
 }
 
 .envelope-front {
@@ -42,22 +41,16 @@ body {
     height: 100%;
     background: #ff4d6d;
     clip-path: polygon(0 40%, 50% 65%, 100% 40%, 100% 100%, 0 100%);
-    border-radius: 10px;
-    z-index: 2;
 }
 
 .flap {
     position: absolute;
     top: 0;
-    left: 0;
     width: 100%;
     height: 50%;
     background: #ff1f4b;
     clip-path: polygon(0 0, 100% 0, 50% 100%);
-    transform-origin: top;
-    transition: transform 0.6s ease;
-    z-index: 3;
-    filter: drop-shadow(0 5px 5px rgba(0,0,0,0.2));
+    transition: 0.6s ease;
 }
 
 .envelope.open {
@@ -70,13 +63,12 @@ body {
     transform: rotateX(180deg);
 }
 
-/* ================= CODE SCREEN ================= */
+/* CODE SCREEN */
 .screen {
     display: none;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    z-index: 20;
 }
 
 input {
@@ -84,7 +76,6 @@ input {
     border-radius: 10px;
     border: none;
     outline: none;
-    margin-top: 10px;
     width: 200px;
     text-align: center;
 }
@@ -96,37 +87,24 @@ button {
     border-radius: 10px;
     background: #ff4d6d;
     color: white;
-    cursor: pointer;
 }
 
-/* ================= TAP HINT (NOT BLOCKING) ================= */
+/* TAP */
 .tapOverlay {
     position: absolute;
     bottom: 30px;
     left: 50%;
     transform: translateX(-50%);
     display: none;
-
     font-size: 16px;
     color: #ff4d6d;
     background: rgba(255,255,255,0.6);
     padding: 8px 14px;
     border-radius: 20px;
-    backdrop-filter: blur(3px);
-
     cursor: pointer;
-    z-index: 5;
-
-    animation: floatHint 1.5s infinite ease-in-out;
 }
 
-@keyframes floatHint {
-    0% { transform: translateX(-50%) translateY(0); opacity: 0.6; }
-    50% { transform: translateX(-50%) translateY(-6px); opacity: 1; }
-    100% { transform: translateX(-50%) translateY(0); opacity: 0.6; }
-}
-
-/* ================= PAPERS ================= */
+/* PAPERS */
 .paper {
     position: absolute;
     width: 320px;
@@ -135,7 +113,7 @@ button {
     border-radius: 15px;
     box-shadow: 0 15px 30px rgba(0,0,0,0.25);
     text-align: center;
-    transition: all 0.8s ease;
+    transition: 0.8s ease;
     opacity: 0;
     transform: translateY(60px) scale(0.9);
 }
@@ -145,18 +123,19 @@ button {
     transform: translateY(0) scale(1);
 }
 
-.paper.front {
-    z-index: 3;
-}
-
-.paper.back {
-    z-index: 2;
-    opacity: 0.5;
-    transform: translateY(-20px) scale(0.95);
-}
+.paper.front { z-index: 3; }
+.paper.back { z-index: 2; opacity: 0.5; }
 
 .paper h2 {
     color: #ff4d6d;
+}
+
+.hint {
+    margin-top: 15px;
+    font-size: 13px;
+    color: #ff4d6d;
+    text-decoration: underline;
+    cursor: pointer;
 }
 </style>
 </head>
@@ -170,14 +149,14 @@ button {
     <div class="flap"></div>
 </div>
 
-<!-- CODE SCREEN -->
+<!-- CODE -->
 <div id="codeScreen" class="screen">
     <h3>Enter Code 💌</h3>
     <input type="password" id="codeInput" placeholder="Enter code...">
     <button onclick="checkCode()">Unlock</button>
 </div>
 
-<!-- TAP HINT -->
+<!-- TAP -->
 <div id="tapOverlay" class="tapOverlay">
     Tap anywhere 💖
 </div>
@@ -195,6 +174,10 @@ button {
 <div id="paper2" class="paper">
     <h2>💌 Message</h2>
     <p>Can I court you?</p>
+
+    <div class="hint" id="backBtn">
+        Tap to read the first paper
+    </div>
 </div>
 
 <script>
@@ -203,20 +186,22 @@ const codeScreen = document.getElementById("codeScreen");
 const paper1 = document.getElementById("paper1");
 const paper2 = document.getElementById("paper2");
 const tapOverlay = document.getElementById("tapOverlay");
+const backBtn = document.getElementById("backBtn");
 
 const secretCode = "1115";
 
-/* open envelope */
+/* open */
 envelope.addEventListener("click", () => {
     envelope.classList.add("open");
 
     setTimeout(() => {
         envelope.style.display = "none";
         codeScreen.style.display = "flex";
+        document.getElementById("codeInput").focus();
     }, 600);
 });
 
-/* check code */
+/* code */
 function checkCode() {
     const input = document.getElementById("codeInput");
 
@@ -231,11 +216,12 @@ function checkCode() {
 
     } else {
         alert("Wrong code 💔 Try again");
+        input.value = "";
         input.focus();
     }
 }
 
-/* tap anywhere */
+/* show paper 2 */
 tapOverlay.addEventListener("click", () => {
     tapOverlay.style.display = "none";
 
@@ -245,6 +231,14 @@ tapOverlay.addEventListener("click", () => {
         paper1.classList.remove("front");
         paper1.classList.add("back");
     }, 200);
+});
+
+/* back to paper 1 */
+backBtn.addEventListener("click", () => {
+    paper2.classList.remove("show", "front");
+
+    paper1.classList.remove("back");
+    paper1.classList.add("show", "front");
 });
 </script>
 
