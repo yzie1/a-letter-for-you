@@ -6,6 +6,10 @@
 <title>Secret Letter 💌</title>
 
 <style>
+* {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
     height: 100vh;
@@ -15,6 +19,7 @@ body {
     background: linear-gradient(135deg, #ffe6f0, #fff);
     font-family: Arial, sans-serif;
     overflow: hidden;
+    touch-action: manipulation;
 }
 
 /* ================= ENVELOPE ================= */
@@ -23,8 +28,8 @@ body {
     height: 160px;
     position: relative;
     cursor: pointer;
-    transition: 0.6s ease;
-    z-index: 5;
+    z-index: 10;
+    touch-action: manipulation;
 }
 
 .envelope-back {
@@ -51,14 +56,13 @@ body {
     height: 50%;
     background: #ff1f4b;
     clip-path: polygon(0 0, 100% 0, 50% 100%);
-    transition: 0.6s ease;
+    transition: 0.5s ease;
 }
 
 .envelope.open {
     transform: translateY(-20px) scale(0.95);
     opacity: 0;
     pointer-events: none;
-    visibility: hidden;
 }
 
 .envelope.open .flap {
@@ -73,18 +77,18 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    text-align: center;
     z-index: 9999;
+    padding: 20px;
 }
 
 input {
     padding: 12px;
+    width: 200px;
     border-radius: 10px;
     border: none;
     outline: none;
-    width: 200px;
     text-align: center;
-    pointer-events: auto;
+    font-size: 16px;
     touch-action: manipulation;
 }
 
@@ -95,25 +99,24 @@ button {
     border-radius: 10px;
     background: #ff4d6d;
     color: white;
+    font-size: 16px;
     cursor: pointer;
-    pointer-events: auto;
     touch-action: manipulation;
 }
 
 /* ================= TAP ================= */
 .tapOverlay {
     position: absolute;
-    bottom: 30px;
+    bottom: 40px;
     left: 50%;
     transform: translateX(-50%);
     display: none;
     font-size: 16px;
     color: #ff4d6d;
-    background: rgba(255,255,255,0.6);
+    background: rgba(255,255,255,0.7);
     padding: 8px 14px;
     border-radius: 20px;
-    cursor: pointer;
-    z-index: 10;
+    z-index: 20;
 }
 
 /* ================= PAPERS ================= */
@@ -125,9 +128,10 @@ button {
     border-radius: 15px;
     box-shadow: 0 15px 30px rgba(0,0,0,0.25);
     text-align: center;
-    transition: 0.8s ease;
+    transition: 0.6s ease;
     opacity: 0;
     transform: translateY(60px) scale(0.9);
+    z-index: 5;
 }
 
 .paper.show {
@@ -135,13 +139,16 @@ button {
     transform: translateY(0) scale(1);
 }
 
-.paper.front { z-index: 3; }
-.paper.back { z-index: 2; opacity: 0.5; }
-
-.paper h2 {
-    color: #ff4d6d;
+.paper.front {
+    z-index: 10;
 }
 
+.paper.back {
+    opacity: 0.5;
+    z-index: 1;
+}
+
+/* clickable hint */
 .hint {
     margin-top: 15px;
     font-size: 13px;
@@ -165,7 +172,7 @@ button {
 <div id="codeScreen" class="screen">
     <h3>Enter Code 💌</h3>
     <input type="password" id="codeInput" placeholder="Enter code...">
-    <button onclick="checkCode()">Unlock</button>
+    <button id="unlockBtn">Unlock</button>
 </div>
 
 <!-- TAP -->
@@ -195,6 +202,9 @@ button {
 <script>
 const envelope = document.getElementById("envelope");
 const codeScreen = document.getElementById("codeScreen");
+const unlockBtn = document.getElementById("unlockBtn");
+const input = document.getElementById("codeInput");
+
 const paper1 = document.getElementById("paper1");
 const paper2 = document.getElementById("paper2");
 const tapOverlay = document.getElementById("tapOverlay");
@@ -202,7 +212,7 @@ const backBtn = document.getElementById("backBtn");
 
 const secretCode = "1115";
 
-/* open envelope */
+/* 1. ENVELOPE CLICK */
 envelope.addEventListener("click", () => {
     envelope.classList.add("open");
 
@@ -210,20 +220,23 @@ envelope.addEventListener("click", () => {
         envelope.style.display = "none";
         codeScreen.style.display = "flex";
 
-        // force mobile focus fix
         setTimeout(() => {
-            const input = document.getElementById("codeInput");
             input.focus();
-            input.click();
-        }, 200);
+        }, 300);
 
-    }, 600);
+    }, 500);
 });
 
-/* check code */
-function checkCode() {
-    const input = document.getElementById("codeInput");
+/* 2. UNLOCK (CLICK + MOBILE SAFE) */
+unlockBtn.addEventListener("click", checkCode);
 
+input.addEventListener("keypress", function(e) {
+    if (e.key === "Enter") {
+        checkCode();
+    }
+});
+
+function checkCode() {
     if (input.value === secretCode) {
         codeScreen.style.display = "none";
 
@@ -231,7 +244,35 @@ function checkCode() {
 
         setTimeout(() => {
             tapOverlay.style.display = "block";
-        }, 600);
+        }, 500);
 
     } else {
         alert("Wrong code 💔 Try again");
+        input.value = "";
+        input.focus();
+    }
+}
+
+/* 3. TAP ANYWHERE */
+tapOverlay.addEventListener("click", () => {
+    tapOverlay.style.display = "none";
+
+    paper2.classList.add("show", "front");
+
+    setTimeout(() => {
+        paper1.classList.remove("front");
+        paper1.classList.add("back");
+    }, 200);
+});
+
+/* 4. BACK TO FIRST PAPER */
+backBtn.addEventListener("click", () => {
+    paper2.classList.remove("show", "front");
+
+    paper1.classList.remove("back");
+    paper1.classList.add("show", "front");
+});
+</script>
+
+</body>
+</html>
