@@ -6,107 +6,128 @@
 <title>Secret Letter 💌</title>
 
 <style>
-    body {
-        margin: 0;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: linear-gradient(135deg, #ffe6f0, #fff);
-        font-family: Arial, sans-serif;
-        overflow: hidden;
-    }
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #ffe6f0, #fff);
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+}
 
-    /* ENVELOPE */
-    .envelope {
-        width: 220px;
-        height: 140px;
-        background: #ff4d6d;
-        position: relative;
-        cursor: pointer;
-        border-radius: 10px;
-        transform-origin: bottom;
-        transition: transform 0.6s ease;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-    }
+/* ENVELOPE */
+.envelope {
+    width: 220px;
+    height: 140px;
+    background: #ff4d6d;
+    position: relative;
+    cursor: pointer;
+    border-radius: 10px;
+    transform-origin: bottom;
+    transition: transform 0.6s ease;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
 
-    .flap {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 0;
-        height: 0;
-        border-left: 110px solid transparent;
-        border-right: 110px solid transparent;
-        border-bottom: 80px solid #ff1f4b;
-        transform-origin: top;
-        transition: transform 0.6s ease;
-    }
+.flap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-left: 110px solid transparent;
+    border-right: 110px solid transparent;
+    border-bottom: 80px solid #ff1f4b;
+    transform-origin: top;
+    transition: transform 0.6s ease;
+}
 
-    .envelope.open .flap {
-        transform: rotateX(180deg);
-    }
+.envelope.open .flap {
+    transform: rotateX(180deg);
+}
 
-    .envelope.open {
-        transform: translateY(-40px);
-        opacity: 0;
-    }
+.envelope.open {
+    transform: translateY(-40px);
+    opacity: 0;
+}
 
-    /* CODE SCREEN */
-    .screen {
-        display: none;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
+/* CODE SCREEN */
+.screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
 
-    input {
-        padding: 12px;
-        border-radius: 10px;
-        border: none;
-        outline: none;
-        margin-top: 10px;
-        width: 200px;
-        text-align: center;
-    }
+input {
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    margin-top: 10px;
+    width: 200px;
+    text-align: center;
+}
 
-    button {
-        margin-top: 10px;
-        padding: 10px 16px;
-        border: none;
-        border-radius: 10px;
-        background: #ff4d6d;
-        color: white;
-        cursor: pointer;
-    }
+button {
+    margin-top: 10px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 10px;
+    background: #ff4d6d;
+    color: white;
+    cursor: pointer;
+}
 
-    /* LETTER */
-    .letter {
-        position: absolute;
-        bottom: -400px;
-        width: 320px;
-        background: white;
-        padding: 25px;
-        border-radius: 15px;
-        box-shadow: 0 15px 30px rgba(0,0,0,0.25);
-        text-align: center;
-        transition: bottom 1s ease;
-    }
+/* TAP OVERLAY */
+.tapOverlay {
+    position: absolute;
+    inset: 0;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    color: #ff4d6d;
+    background: rgba(255,255,255,0.4);
+    backdrop-filter: blur(2px);
+    cursor: pointer;
+}
 
-    .letter.show {
-        bottom: 80px;
-    }
+/* PAPERS */
+.paper {
+    position: absolute;
+    width: 320px;
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+    text-align: center;
+    transition: all 0.8s ease;
+    opacity: 0;
+    transform: translateY(60px) scale(0.9);
+}
 
-    .letter h2 {
-        margin-bottom: 10px;
-        color: #ff4d6d;
-    }
+.paper.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
 
-    .hint {
-        font-size: 12px;
-        color: gray;
-        margin-top: 8px;
-    }
+.paper h2 {
+    margin-bottom: 10px;
+    color: #ff4d6d;
+}
+
+/* Paper swap animation */
+.paper.back {
+    transform: translateY(-20px) scale(0.95);
+    opacity: 0.6;
+    z-index: 1;
+}
+
+.paper.front {
+    z-index: 2;
+}
 </style>
 </head>
 
@@ -125,8 +146,13 @@
     <div class="hint">Hint: Your birth month and day</div>
 </div>
 
-<!-- LETTER -->
-<div id="letter" class="letter">
+<!-- TAP ANYWHERE -->
+<div id="tapOverlay" class="tapOverlay">
+    Tap anywhere 💖
+</div>
+
+<!-- PAPER 1 -->
+<div id="paper1" class="paper">
     <h2>💖 To Lovely</h2>
     <p>
         I’ve been thinking about this for a long time because I wasn’t sure what I really felt.<br><br>
@@ -134,10 +160,20 @@
     </p>
 </div>
 
+<!-- PAPER 2 -->
+<div id="paper2" class="paper">
+    <h2>💌 Another Thought</h2>
+    <p>
+        can i court you?
+    </p>
+</div>
+
 <script>
 const envelope = document.getElementById("envelope");
 const codeScreen = document.getElementById("codeScreen");
-const letter = document.getElementById("letter");
+const paper1 = document.getElementById("paper1");
+const paper2 = document.getElementById("paper2");
+const tapOverlay = document.getElementById("tapOverlay");
 
 const secretCode = "1115";
 
@@ -157,11 +193,28 @@ function checkCode() {
 
     if (input === secretCode) {
         codeScreen.style.display = "none";
-        letter.classList.add("show");
+
+        paper1.classList.add("show");
+        paper1.classList.add("front");
+
+        tapOverlay.style.display = "flex";
     } else {
         alert("Wrong code 💔 Try again");
     }
 }
+
+// Step 3: tap anywhere to reveal second paper
+tapOverlay.addEventListener("click", () => {
+    tapOverlay.style.display = "none";
+
+    // move first paper behind
+    paper1.classList.remove("front");
+    paper1.classList.add("back");
+
+    // show second paper in front
+    paper2.classList.add("show");
+    paper2.classList.add("front");
+});
 </script>
 
 </body>
