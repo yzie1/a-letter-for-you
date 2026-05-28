@@ -27,7 +27,6 @@ body {
     transition: transform 0.6s ease, opacity 0.6s ease;
 }
 
-/* BACK */
 .envelope-back {
     position: absolute;
     width: 100%;
@@ -37,7 +36,6 @@ body {
     box-shadow: inset 0 -10px 20px rgba(0,0,0,0.2);
 }
 
-/* FRONT POCKET */
 .envelope-front {
     position: absolute;
     bottom: 0;
@@ -49,7 +47,6 @@ body {
     z-index: 2;
 }
 
-/* FIXED FLAP (NOW CORRECT ORIENTATION) */
 .flap {
     position: absolute;
     top: 0;
@@ -64,7 +61,6 @@ body {
     filter: drop-shadow(0 5px 5px rgba(0,0,0,0.2));
 }
 
-/* OPEN ANIMATION */
 .envelope.open .flap {
     transform: rotateX(180deg);
 }
@@ -102,21 +98,23 @@ button {
     cursor: pointer;
 }
 
-/* TAP */
+/* ================= TAP OVERLAY ================= */
 .tapOverlay {
     position: absolute;
     inset: 0;
     display: none;
     justify-content: center;
     align-items: center;
-    font-size: 18px;
+    font-size: 20px;
+    font-weight: bold;
     color: #ff4d6d;
-    background: rgba(255,255,255,0.4);
-    backdrop-filter: blur(2px);
+    background: rgba(255,255,255,0.5);
+    backdrop-filter: blur(3px);
     cursor: pointer;
+    z-index: 10;
 }
 
-/* PAPERS */
+/* ================= PAPERS ================= */
 .paper {
     position: absolute;
     width: 320px;
@@ -135,16 +133,18 @@ button {
     transform: translateY(0) scale(1);
 }
 
-.paper h2 {
-    margin-bottom: 10px;
-    color: #ff4d6d;
+.paper.front {
+    z-index: 3;
 }
 
-.paper.front { z-index: 2; }
 .paper.back {
-    z-index: 1;
-    opacity: 0.6;
+    z-index: 2;
+    opacity: 0.5;
     transform: translateY(-20px) scale(0.95);
+}
+
+.paper h2 {
+    color: #ff4d6d;
 }
 </style>
 </head>
@@ -194,7 +194,7 @@ const tapOverlay = document.getElementById("tapOverlay");
 
 const secretCode = "1115";
 
-/* open envelope */
+/* envelope open */
 envelope.addEventListener("click", () => {
     envelope.classList.add("open");
 
@@ -210,21 +210,28 @@ function checkCode() {
 
     if (input === secretCode) {
         codeScreen.style.display = "none";
+
         paper1.classList.add("show", "front");
-        tapOverlay.style.display = "flex";
+
+        setTimeout(() => {
+            tapOverlay.style.display = "flex";
+        }, 600);
+
     } else {
         alert("Wrong code 💔 Try again");
     }
 }
 
-/* tap swap papers */
+/* tap anywhere */
 tapOverlay.addEventListener("click", () => {
     tapOverlay.style.display = "none";
 
-    paper1.classList.remove("front");
-    paper1.classList.add("back");
-
     paper2.classList.add("show", "front");
+
+    setTimeout(() => {
+        paper1.classList.remove("front");
+        paper1.classList.add("back");
+    }, 200);
 });
 </script>
 
