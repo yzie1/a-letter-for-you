@@ -17,42 +17,63 @@ body {
     overflow: hidden;
 }
 
-/* ENVELOPE */
+/* ================= ENVELOPE ================= */
 .envelope {
-    width: 220px;
-    height: 140px;
-    background: #ff4d6d;
+    width: 240px;
+    height: 160px;
     position: relative;
     cursor: pointer;
-    border-radius: 10px;
-    transform-origin: bottom;
-    transition: transform 0.6s ease;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    transform-style: preserve-3d;
+    transition: transform 0.6s ease, opacity 0.6s ease;
 }
 
+/* BACK */
+.envelope-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #ff2f55;
+    border-radius: 10px;
+    box-shadow: inset 0 -10px 20px rgba(0,0,0,0.2);
+}
+
+/* FRONT POCKET */
+.envelope-front {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background: #ff4d6d;
+    clip-path: polygon(0 40%, 50% 65%, 100% 40%, 100% 100%, 0 100%);
+    border-radius: 10px;
+    z-index: 2;
+}
+
+/* FLAP */
 .flap {
     position: absolute;
     top: 0;
-    left: 0;
-    width: 0;
-    height: 0;
-    border-left: 110px solid transparent;
-    border-right: 110px solid transparent;
-    border-bottom: 80px solid #ff1f4b;
+    width: 100%;
+    height: 100%;
+    background: #ff1f4b;
+    clip-path: polygon(0 0, 50% 55%, 100% 0);
     transform-origin: top;
     transition: transform 0.6s ease;
+    z-index: 3;
+    filter: drop-shadow(0 5px 5px rgba(0,0,0,0.2));
 }
 
+/* OPEN ANIMATION */
 .envelope.open .flap {
     transform: rotateX(180deg);
 }
 
 .envelope.open {
-    transform: translateY(-40px);
+    transform: translateY(-20px) scale(0.95);
     opacity: 0;
 }
 
-/* CODE SCREEN */
+/* ================= CODE SCREEN ================= */
 .screen {
     display: none;
     flex-direction: column;
@@ -80,7 +101,7 @@ button {
     cursor: pointer;
 }
 
-/* TAP OVERLAY */
+/* ================= TAP OVERLAY ================= */
 .tapOverlay {
     position: absolute;
     inset: 0;
@@ -94,7 +115,7 @@ button {
     cursor: pointer;
 }
 
-/* PAPERS */
+/* ================= PAPERS ================= */
 .paper {
     position: absolute;
     width: 320px;
@@ -118,15 +139,15 @@ button {
     color: #ff4d6d;
 }
 
-/* Paper swap animation */
-.paper.back {
-    transform: translateY(-20px) scale(0.95);
-    opacity: 0.6;
-    z-index: 1;
-}
-
+/* layering */
 .paper.front {
     z-index: 2;
+}
+
+.paper.back {
+    z-index: 1;
+    opacity: 0.6;
+    transform: translateY(-20px) scale(0.95);
 }
 </style>
 </head>
@@ -135,10 +156,12 @@ button {
 
 <!-- ENVELOPE -->
 <div id="envelope" class="envelope">
+    <div class="envelope-back"></div>
+    <div class="envelope-front"></div>
     <div class="flap"></div>
 </div>
 
-<!-- CODE INPUT -->
+<!-- CODE SCREEN -->
 <div id="codeScreen" class="screen">
     <h3>Enter Code 💌</h3>
     <input type="password" id="codeInput" placeholder="Enter code...">
@@ -163,9 +186,7 @@ button {
 <!-- PAPER 2 -->
 <div id="paper2" class="paper">
     <h2>💌 Another Thought</h2>
-    <p>
-        can i court you?
-    </p>
+    <p>can i court you?</p>
 </div>
 
 <script>
@@ -177,7 +198,7 @@ const tapOverlay = document.getElementById("tapOverlay");
 
 const secretCode = "1115";
 
-// Step 1: open envelope
+/* open envelope */
 envelope.addEventListener("click", () => {
     envelope.classList.add("open");
 
@@ -187,33 +208,28 @@ envelope.addEventListener("click", () => {
     }, 600);
 });
 
-// Step 2: check code
+/* check code */
 function checkCode() {
     const input = document.getElementById("codeInput").value;
 
     if (input === secretCode) {
         codeScreen.style.display = "none";
 
-        paper1.classList.add("show");
-        paper1.classList.add("front");
-
+        paper1.classList.add("show", "front");
         tapOverlay.style.display = "flex";
     } else {
         alert("Wrong code 💔 Try again");
     }
 }
 
-// Step 3: tap anywhere to reveal second paper
+/* tap to reveal second paper */
 tapOverlay.addEventListener("click", () => {
     tapOverlay.style.display = "none";
 
-    // move first paper behind
     paper1.classList.remove("front");
     paper1.classList.add("back");
 
-    // show second paper in front
-    paper2.classList.add("show");
-    paper2.classList.add("front");
+    paper2.classList.add("show", "front");
 });
 </script>
 
